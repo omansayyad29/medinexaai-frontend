@@ -1,36 +1,35 @@
-import { AppointmentChart } from "@/components/dashboard/AppointmentChart";
-import { GrowthChart } from "@/components/dashboard/GrowthChart";
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { StatsCards } from "@/components/dashboard/StatsCards";
+import { USER_ROLES } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-helpers";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Dashboard overview
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Welcome back to the Medinexa Super Admin Panel. Here is what's
-          happening today.
-        </p>
-      </div>
+export default async function RootPage() {
+  console.log("[RootPage] Rendering root page...");
+  const user = await getCurrentUser();
 
-      <StatsCards />
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="lg:col-span-4 flex flex-col gap-4">
-          <div className="h-[350px]">
-            <GrowthChart />
-          </div>
-          <div className="h-[350px]">
-            <AppointmentChart />
-          </div>
-        </div>
-        <div className="lg:col-span-3">
-          <RecentActivity />
-        </div>
-      </div>
-    </div>
+  console.log(
+    "[RootPage] User:",
+    user ? `${user.email} (${user.role})` : "null",
   );
+
+  if (!user) {
+    console.log("[RootPage] No user found, redirecting to /login");
+    return redirect("/login");
+  }
+
+  // Redirect to appropriate dashboard based on role
+  const role = user.role?.toUpperCase();
+  switch (role) {
+    case USER_ROLES.ADMIN:
+      console.log("[RootPage] Redirecting to /admin");
+      return redirect("/admin");
+    case USER_ROLES.CLINIC:
+      console.log("[RootPage] Redirecting to /clinic");
+      return redirect("/clinic");
+    case USER_ROLES.USER:
+      console.log("[RootPage] Redirecting to /user");
+      return redirect("/user");
+    default:
+      console.log("[RootPage] Unknown role, redirecting to /login");
+      return redirect("/login");
+  }
 }

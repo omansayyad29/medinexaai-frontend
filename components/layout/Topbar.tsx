@@ -2,15 +2,25 @@
 
 import { Bell, Menu, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { NAVIGATION_ROUTES } from "@/constants/routes";
 
-export function Topbar() {
+type NavItem = {
+  name: string;
+  href?: string;
+  type?: string;
+};
+
+interface TopbarProps {
+  routes: NavItem[];
+}
+
+export function Topbar({ routes }: TopbarProps) {
   const pathname = usePathname();
 
-  const currentRoute = NAVIGATION_ROUTES.find(
+  const currentRoute = routes.find(
     (route) =>
-      pathname === route.href ||
-      (pathname.startsWith(`${route.href}/`) && route.href !== "/"),
+      route.href &&
+      (pathname === route.href ||
+        (pathname.startsWith(`${route.href}/`) && route.href !== "/")),
   ) || { name: "Dashboard" };
 
   return (

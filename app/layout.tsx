@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Topbar } from "@/components/layout/Topbar";
 import { cn } from "@/lib/utils";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -39,14 +38,9 @@ export default function RootLayout({
         figtree.variable,
       )}
     >
-      <body className="flex h-screen overflow-hidden bg-background">
-        <Sidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <Topbar />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-muted/20">
-            {children}
-          </main>
-        </div>
+      <body className="flex h-screen overflow-hidden bg-background antialiased">
+        {children}
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );
