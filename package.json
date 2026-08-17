@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "biome check",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "format": "biome format --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -16,6 +17,7 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@better-auth/drizzle-adapter": "^1.6.29",
+    "@hookform/resolvers": "^5.9.1",
     "@hugeicons/core-free-icons": "^4.2.3",
     "@hugeicons/react": "^1.1.9",
     "@neondatabase/serverless": "^1.1.0",
@@ -45,7 +47,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@10.29.3"
 }

@@ -1,7 +1,10 @@
 import { Building } from "lucide-react";
 import { redirect } from "next/navigation";
-import { type Role } from "@/lib/auth";
-import { getCurrentUser, getDefaultRoute } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/auth-helpers";
+import { getDefaultRoute } from "@/lib/roles";
+
+// Renders based on the session, so it must not be statically prerendered.
+export const dynamic = "force-dynamic";
 
 export default async function AuthLayout({
   children,
@@ -12,7 +15,7 @@ export default async function AuthLayout({
 
   // Already signed in? Send them directly to their default dashboard.
   if (user) {
-    redirect(getDefaultRoute(user.role as Role));
+    redirect(getDefaultRoute(user.role));
   }
 
   return (

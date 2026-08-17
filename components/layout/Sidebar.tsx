@@ -26,7 +26,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -94,7 +94,6 @@ export function Sidebar({
   logoLabel = "Medinexa AI",
 }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background md:flex">
@@ -109,16 +108,20 @@ export function Sidebar({
 
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="grid gap-1 px-2">
-          {routes.map((route, index) => {
+          {routes.map((route) => {
             // Render section heading
             if (route.type === "heading") {
               return (
-                <li key={`heading-${index}`} className="pt-4 pb-1 px-3">
+                <li key={route.name} className="pt-4 pb-1 px-3">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {route.name}
                   </span>
                 </li>
               );
+            }
+
+            if (!route.href) {
+              return null;
             }
 
             const isActive =
@@ -128,7 +131,7 @@ export function Sidebar({
             return (
               <li key={route.href}>
                 <Link
-                  href={route.href!}
+                  href={route.href}
                   className={cn(
                     "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     isActive

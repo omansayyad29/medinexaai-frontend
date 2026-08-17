@@ -144,7 +144,7 @@ export const USER_ROUTES: NavItem[] = [
 /**
  * Get navigation routes for a specific role.
  */
-export function getRoutesForRole(role: string): NavItem[] {
+export function getRoutesForRole(role?: string | null): NavItem[] {
   const normalizedRole = role?.toUpperCase();
   switch (normalizedRole) {
     case "ADMIN":

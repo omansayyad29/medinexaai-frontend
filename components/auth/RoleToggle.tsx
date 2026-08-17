@@ -1,10 +1,9 @@
 "use client";
 
+import type { Role } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
-type Role = "USER" | "CLINIC" | "ADMIN";
-
-const OPTIONS: { value: Role; label: string }[] = [
+export const ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: "USER", label: "User" },
   { value: "CLINIC", label: "Clinic" },
   { value: "ADMIN", label: "Admin" },
@@ -13,13 +12,20 @@ const OPTIONS: { value: Role; label: string }[] = [
 export function RoleToggle({
   value,
   onChange,
+  options = ROLE_OPTIONS,
 }: {
   value: Role;
   onChange: (role: Role) => void;
+  options?: { value: Role; label: string }[];
 }) {
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
-      {OPTIONS.map((option) => (
+    <div
+      className="grid gap-1 rounded-lg bg-muted p-1"
+      style={{
+        gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+      }}
+    >
+      {options.map((option) => (
         <button
           key={option.value}
           type="button"

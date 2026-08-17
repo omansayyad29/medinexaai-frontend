@@ -1,13 +1,15 @@
+import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { isGoogleEnabled } from "@/lib/auth-config";
 
 export const metadata = {
-  title: "Sign in | Medinexa AI",
+  title: "Sign in",
 };
 
-const googleEnabled =
-  Boolean(process.env.GOOGLE_CLIENT_ID) &&
-  Boolean(process.env.GOOGLE_CLIENT_SECRET);
-
 export default function LoginPage() {
-  return <LoginForm googleEnabled={googleEnabled} />;
+  return (
+    <Suspense>
+      <LoginForm googleEnabled={isGoogleEnabled} />
+    </Suspense>
+  );
 }

@@ -29,8 +29,14 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Creating an admin account
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Admin accounts are **not** available through public registration — only users and clinics can self-register (the server action rejects any other role).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To promote an existing account to admin, update its role directly in the database:
+
+```sql
+UPDATE "user" SET role = 'ADMIN' WHERE email = 'you@example.com';
+```
+
+After the change the account's existing session is unaffected; on the next login they will be redirected to `/admin`.

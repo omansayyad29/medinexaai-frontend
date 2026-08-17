@@ -1,7 +1,7 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { z } from "zod";
 import { type RegisterInput, register } from "@/app/(auth)/actions";
 import { getAuthErrorMessage } from "@/components/auth/auth-errors";
 import { GoogleButton } from "@/components/auth/GoogleButton";
-import { RoleToggle } from "@/components/auth/RoleToggle";
+import { ROLE_OPTIONS, RoleToggle } from "@/components/auth/RoleToggle";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,8 +21,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
+import type { Role } from "@/lib/roles";
 
-type Role = "USER" | "CLINIC" | "ADMIN";
+// Admin accounts cannot be created through public registration.
+const REGISTER_ROLE_OPTIONS = ROLE_OPTIONS.filter(
+  (option) => option.value !== "ADMIN",
+);
 
 const registerSchema = z
   .object({
@@ -39,20 +43,22 @@ const registerSchema = z
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
-  const router = useRouter();
   const [role, setRole] = useState<Role>("USER");
   const {
     register: registerField,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterValues>();
+  } = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+  });
 
   async function onSubmit(values: RegisterValues) {
     const { error } = await register({
       name: values.name,
       email: values.email,
       password: values.password,
-      role,
+      // The toggle never offers ADMIN; this narrowing keeps the type honest.
+      role: role === "ADMIN" ? "USER" : role,
     } satisfies RegisterInput);
 
     if (error) {
@@ -63,9 +69,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     toast.success(
       role === "CLINIC"
         ? "Clinic account created — welcome!"
-        : role === "ADMIN"
-          ? "Admin account created — welcome!"
-          : "Account created — welcome!",
+        : "Account created — welcome!",
     );
     window.location.href = "/";
   }
@@ -79,9 +83,17 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <RoleToggle value={role} onChange={setRole} />
+        <RoleToggle
+          value={role}
+          onChange={setRole}
+          options={REGISTER_ROLE_OPTIONS}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">
               {role === "CLINIC" ? "Clinic name" : "Full name"}
@@ -155,9 +167,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
               ? "Creating account…"
               : role === "CLINIC"
                 ? "Create clinic account"
-                : role === "ADMIN"
-                  ? "Create admin account"
-                  : "Create account"}
+                : "Create account"}
           </Button>
         </form>
 

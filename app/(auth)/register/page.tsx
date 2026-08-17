@@ -1,13 +1,10 @@
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { isGoogleEnabled } from "@/lib/auth-config";
 
 export const metadata = {
-  title: "Create account | Medinexa AI",
+  title: "Create account",
 };
 
-const googleEnabled =
-  Boolean(process.env.GOOGLE_CLIENT_ID) &&
-  Boolean(process.env.GOOGLE_CLIENT_SECRET);
-
 export default function RegisterPage() {
-  return <RegisterForm googleEnabled={googleEnabled} />;
+  return <RegisterForm googleEnabled={isGoogleEnabled} />;
 }

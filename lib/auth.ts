@@ -4,17 +4,9 @@ import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
-/** Roles an account can have. Only these values are ever stored. */
-export const USER_ROLES = {
-  ADMIN: "ADMIN",
-  CLINIC: "CLINIC",
-  USER: "USER",
-} as const;
+// Re-exported for backwards compatibility; prefer importing from "@/lib/roles".
+export { ROLES, type Role, USER_ROLES } from "./roles";
 
-export type Role = (typeof USER_ROLES)[keyof typeof USER_ROLES];
-
-/** Array of valid role values for zod validation */
-export const ROLES = ["ADMIN", "CLINIC", "USER"] as const;
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -30,10 +22,12 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 minutes cache
-    },
+    // NOTE: the cookie cache is intentionally NOT enabled. It snapshots the
+    // user object (including role) into a cookie, so server-side role changes
+    // (e.g. the clinic upgrade in the register action, or a later DB update)
+    // would not be visible for up to maxAge minutes — breaking role-based
+    // redirects like clinic signup → /clinic. Every request reads the session
+    // from the DB instead, which is one indexed query and always current.
   },
 
   emailAndPassword: {

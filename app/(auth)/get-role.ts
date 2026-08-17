@@ -1,7 +1,7 @@
 "use server";
 
 import { getCurrentUser } from "@/lib/auth-helpers";
-import { USER_ROLES, type Role } from "@/lib/auth";
+import { getDefaultRoute, type Role } from "@/lib/roles";
 
 /**
  * Get the current user's role after login.
@@ -14,27 +14,18 @@ export async function getUserRole(): Promise<Role | null> {
     return null;
   }
 
-  return user.role as Role;
+  return user.role;
 }
 
 /**
  * Get the default dashboard route for the current user.
  */
 export async function getDashboardRoute(): Promise<string> {
-  const role = await getUserRole();
+  const user = await getCurrentUser();
 
-  if (!role) {
+  if (!user) {
     return "/login";
   }
 
-  switch (role) {
-    case USER_ROLES.ADMIN:
-      return "/admin";
-    case USER_ROLES.CLINIC:
-      return "/clinic";
-    case USER_ROLES.USER:
-      return "/user";
-    default:
-      return "/login";
-  }
+  return getDefaultRoute(user.role);
 }

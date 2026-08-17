@@ -1,29 +1,18 @@
-import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { ADMIN_ROUTES } from "@/constants/routes";
-import { getCurrentUser } from "@/lib/auth-helpers";
-import { USER_ROLES } from "@/lib/auth";
+import { requireRole } from "@/lib/auth-helpers";
+import { USER_ROLES } from "@/lib/roles";
+
+// Renders based on the session, so it must not be statically prerendered.
+export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  if (user.role !== USER_ROLES.ADMIN) {
-    // Redirect to appropriate dashboard based on role
-    if (user.role === USER_ROLES.CLINIC) {
-      redirect("/clinic");
-    } else {
-      redirect("/user");
-    }
-  }
+  const user = await requireRole(USER_ROLES.ADMIN);
 
   return (
     <div className="flex h-screen w-full overflow-hidden">

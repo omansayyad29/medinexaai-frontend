@@ -1,11 +1,17 @@
 import { Calendar, MessageCircle, Plus, Stethoscope } from "lucide-react";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
-export default function UserDashboardPage() {
+export default async function UserDashboardPage() {
+  const user = await getCurrentUser();
+  const firstName = user?.name?.split(" ")[0] ?? "there";
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold tracking-tight">Welcome, John! 👋</h2>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Welcome, {firstName}! 👋
+        </h2>
         <p className="text-muted-foreground text-sm">
           Here&apos;s an overview of your healthcare journey.
         </p>
@@ -85,9 +91,9 @@ export default function UserDashboardPage() {
               type: "Follow-up",
               status: "Completed",
             },
-          ].map((item, index) => (
+          ].map((item) => (
             <div
-              key={index}
+              key={`${item.date}-${item.doctor}`}
               className="flex items-center justify-between text-sm p-3 rounded-lg hover:bg-muted/50"
             >
               <div className="flex items-center gap-4">
@@ -127,9 +133,9 @@ export default function UserDashboardPage() {
               specialty: "General Physician",
               clinic: "City Medical Center",
             },
-          ].map((doctor, index) => (
+          ].map((doctor) => (
             <div
-              key={index}
+              key={doctor.name}
               className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
             >
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">

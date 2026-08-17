@@ -1,12 +1,12 @@
 import {
   Activity,
+  Building2,
   Calendar,
   CreditCard,
   HeartPulse,
   MessageSquare,
   Stethoscope,
   Users,
-  Building2,
 } from "lucide-react";
 
 const STATS = [
@@ -128,9 +128,9 @@ export default function AdminDashboardPage() {
                 time: "3 hours ago",
                 type: "ai",
               },
-            ].map((item, index) => (
+            ].map((item) => (
               <div
-                key={index}
+                key={item.action}
                 className="flex items-center justify-between text-sm"
               >
                 <span className="text-foreground">{item.action}</span>
@@ -149,9 +149,9 @@ export default function AdminDashboardPage() {
               { label: "Memory Usage", value: "62%", status: "warning" },
               { label: "CPU Usage", value: "34%", status: "good" },
               { label: "Active Sessions", value: "1,234", status: "good" },
-            ].map((item, index) => (
+            ].map((item) => (
               <div
-                key={index}
+                key={item.label}
                 className="flex items-center justify-between text-sm"
               >
                 <span className="text-muted-foreground">{item.label}</span>

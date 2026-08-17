@@ -5,15 +5,16 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { user } from "@/db/schema";
-import { auth, USER_ROLES } from "@/lib/auth";
+import { auth } from "@/lib/auth";
+import { USER_ROLES } from "@/lib/roles";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z
-    .enum([USER_ROLES.ADMIN, USER_ROLES.CLINIC, USER_ROLES.USER])
-    .default(USER_ROLES.USER),
+  // Admin accounts cannot be self-registered; they are created directly in
+  // the database (see README).
+  role: z.enum([USER_ROLES.CLINIC, USER_ROLES.USER]).default(USER_ROLES.USER),
 });
 
 export type RegisterInput = z.input<typeof registerSchema>;
@@ -25,7 +26,7 @@ export type RegisterResult = {
 /**
  * Creates a new account and signs the user in (the session cookie is set via
  * the nextCookies plugin). The role is validated and assigned server-side so
- * clients can never pick a role that isn't in ROLES.
+ * clients can never pick a role that isn't allowed (USER or CLINIC).
  */
 export async function register(input: RegisterInput): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(input);
@@ -47,9 +48,9 @@ export async function register(input: RegisterInput): Promise<RegisterResult> {
       body: { name, email, password },
     });
 
-    // role is input:false, so signUpEmail always creates "USER". Clinic and admin
+    // role is input:false, so signUpEmail always creates "USER". Clinic
     // accounts are upgraded with a direct, server-owned database write.
-    if (role === USER_ROLES.CLINIC || role === USER_ROLES.ADMIN) {
+    if (role === USER_ROLES.CLINIC) {
       await db.update(user).set({ role }).where(eq(user.id, createdUser.id));
     }
   } catch (error) {

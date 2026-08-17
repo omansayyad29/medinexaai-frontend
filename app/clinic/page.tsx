@@ -158,9 +158,9 @@ export default function ClinicDashboardPage() {
                 patient: "Robert Wilson",
                 type: "Consultation",
               },
-            ].map((item, index) => (
+            ].map((item) => (
               <div
-                key={index}
+                key={`${item.time}-${item.patient}`}
                 className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-muted/50"
               >
                 <div className="flex items-center gap-3">
@@ -199,9 +199,9 @@ export default function ClinicDashboardPage() {
                 query: "Test results",
                 status: "Resolved",
               },
-            ].map((item, index) => (
+            ].map((item) => (
               <div
-                key={index}
+                key={`${item.patient}-${item.query}`}
                 className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-muted/50"
               >
                 <div className="flex flex-col">

@@ -1,9 +1,9 @@
 import "server-only";
 
-import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { USER_ROLES, type Role } from "@/lib/auth";
+import { cache } from "react";
+import { getDefaultRoute, normalizeRole, type Role } from "@/lib/roles";
 
 /**
  * Get the current session user.
@@ -20,11 +20,9 @@ export const getCurrentUser = cache(async () => {
       return null;
     }
 
-    const normalizedRole = (session.user.role || "USER").toUpperCase() as Role;
-
     return {
       ...session.user,
-      role: normalizedRole,
+      role: normalizeRole(session.user.role),
     };
   } catch (e) {
     console.error("[getCurrentUser] Error:", e);
@@ -43,30 +41,11 @@ export async function requireRole(requiredRole: Role) {
     redirect("/login");
   }
 
-  const userRole = (currentUser.role || "USER").toUpperCase() as Role;
-
-  if (userRole !== requiredRole) {
-    redirect(getDefaultRoute(userRole));
+  if (currentUser.role !== requiredRole) {
+    redirect(getDefaultRoute(currentUser.role));
   }
 
   return currentUser;
-}
-
-/**
- * Get the default route for a given role.
- */
-export function getDefaultRoute(role?: string | null): string {
-  const normalizedRole = role?.toUpperCase();
-  switch (normalizedRole) {
-    case USER_ROLES.ADMIN:
-      return "/admin";
-    case USER_ROLES.CLINIC:
-      return "/clinic";
-    case USER_ROLES.USER:
-      return "/user";
-    default:
-      return "/login";
-  }
 }
 
 /**
@@ -79,5 +58,5 @@ export async function hasRole(requiredRole: Role): Promise<boolean> {
     return false;
   }
 
-  return (currentUser.role || "USER").toUpperCase() === requiredRole;
+  return currentUser.role === requiredRole;
 }

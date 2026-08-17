@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -20,8 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
-
-type Role = "USER" | "CLINIC" | "ADMIN";
+import type { Role } from "@/lib/roles";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -37,7 +37,9 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginValues>();
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
   async function onSubmit(values: LoginValues) {
     const { error } = await signIn.email(values);
@@ -49,7 +51,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
     toast.success("Welcome back!");
     const callbackUrl = searchParams.get("callbackUrl");
-    if (callbackUrl && callbackUrl.startsWith("/")) {
+    if (callbackUrl?.startsWith("/")) {
       window.location.href = callbackUrl;
     } else {
       window.location.href = "/";
@@ -65,7 +67,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       <CardContent className="flex flex-col gap-4">
         <RoleToggle value={role} onChange={setRole} />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
